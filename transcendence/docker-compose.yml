@@ -75,12 +75,17 @@ services:
       - shared-data:/app/shared
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      target: development
     ports:
-      - "3004:3004"  # Docker frontend on port 3004
+      - "3004:3004"
     environment:
       - NODE_ENV=development
-      #- REACT_APP_API_URL=http://localhost:3000 // We don't use REACT
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 
   database:
     image: alpine:latest
