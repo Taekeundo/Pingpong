@@ -1,7 +1,6 @@
 // frontend/src/pages/lobby.ts
 import { getAuth, signOut } from "@/app/auth";
 import { navigate } from "@/app/router";
-import { getState, subscribe } from "@/app/store";
 import { mountLobbyScene } from "@/renderers/babylon/lobby-scene";
 
 export default function (root: HTMLElement) {
@@ -65,7 +64,6 @@ export default function (root: HTMLElement) {
 
   function renderUserInfo() {
     const user = getAuth();
-    const state = getState();
 
 	// 🔒 Check if user exists and is valid
 	if (user && user.id) {
@@ -87,12 +85,6 @@ export default function (root: HTMLElement) {
 					title="Sign out">
             	Sign out
           	</button>
-        </div>`;
-    } else if (state?.session?.alias) {
-      userInfo.innerHTML = `
-        <div class="flex items-center gap-1">
-          <span class="text-blue-600">●</span>
-          <span class="font-medium">Guest: ${state.session.alias}</span>
         </div>`;
     } else {
       // ⚠️ User data is invalid or missing - show sign in option
@@ -118,13 +110,11 @@ export default function (root: HTMLElement) {
 
   const onAuthChanged = () => { renderUserInfo(); };
   window.addEventListener("auth:changed", onAuthChanged);
-  const unsubscribeStore = subscribe(() => renderUserInfo());
 
   return () => {
     window.removeEventListener("auth:changed", onAuthChanged);
     window.removeEventListener("resize", renderViewport);
 	userInfo.removeEventListener("click", onUserInfoClick);
-    unsubscribeStore();
     unmountBg();
   };
 }
